@@ -1,6 +1,6 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-ARG BASE_CONTAINER=jupyter/scipy-notebook
+ARG BASE_CONTAINER=jupyter/scipy-notebook:ubuntu-18.04
 FROM $BASE_CONTAINER
 
 USER root
@@ -27,7 +27,7 @@ RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-without-hadoop spar
 
 # Install hadoop
 RUN cd /tmp && \
-    wget http://us.mirrors.quenda.co/apache/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
+    wget https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
     tar xzf hadoop-${HADOOP_VERSION}.tar.gz -C /usr/local --owner root --group root --no-same-owner && \
     rm hadoop-${HADOOP_VERSION}.tar.gz
 RUN cd /usr/local && ln -s hadoop-${HADOOP_VERSION} hadoop
@@ -37,7 +37,8 @@ RUN cd /usr/local && ln -s hadoop-${HADOOP_VERSION} hadoop
 # exist a Bionic repository and the dependencies seem to be compatible for now.
 COPY config/mesos.key /tmp/
 RUN apt-get -y update && \
-    apt-get install --no-install-recommends -y gnupg && \
+    apt-get install -y libcurl4 && \
+    apt-get install --no-install-recommends -y gnupg  && \
     apt-key add /tmp/mesos.key && \
     echo "deb http://repos.mesosphere.io/ubuntu xenial main" > /etc/apt/sources.list.d/mesosphere.list && \
     apt-get -y update && \
@@ -101,7 +102,8 @@ RUN conda install --quiet --yes \
 
 # Apache Toree kernel
 RUN pip install --no-cache-dir \
-    https://dist.apache.org/repos/dist/release/incubator/toree/0.3.0-incubating/toree-pip/toree-0.3.0.tar.gz \
+    # https://dist.apache.org/repos/dist/release/incubator/toree/0.3.0-incubating/toree-pip/toree-0.3.0.tar.gz \
+    https://archive.apache.org/dist/incubator/toree/0.3.0-incubating/toree-pip/toree-0.3.0.tar.gz \
     && \
     jupyter toree install --sys-prefix && \
     rm -rf /home/$NB_USER/.local && \

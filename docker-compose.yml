@@ -56,7 +56,8 @@ services:
         - minio_volume:/data
     ports:
         - 9000:9000
-    command: server /data 
+        - 9001:9001
+    command: server /data --console-address ":9001"
   # API
   fastapi:
     container_name: "fastapi"
@@ -68,7 +69,7 @@ services:
       - ./services/fastapi/app:/app
       - ./services/fastapi/html:/html
     ports:
-      - 80:80
+      - 8080:80
   # Visualization
   superset:
     build: ./services/superset/
